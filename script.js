@@ -2,7 +2,8 @@ const express = require("express");
 const fs = require("fs").promises;
 const uuid = require("uuid");
 
-
+const app = express();
+const port = 3000;
 async function readData() {
     try {
         const data = await fs.readFile("./logs.txt", "utf-8");
@@ -31,10 +32,8 @@ async function createLog(name){
         console.error(err);
     }
 }
-createLog("Lucas");
 
-const data = readData();
-data.then((data) => {
-    console.log(data)
+app.use(express.json());
+app.listen(port, () => {
+    console.log(`Servidor rodando em http://localhost:${port}`);
 })
-
