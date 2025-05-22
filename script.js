@@ -26,13 +26,48 @@ async function createLog(name){
     const time = new Date().toISOString();
     const id = uuid.v4();
     try {
-        const log = `${id} ${time} ${name} \n`;
+        const log = `${id} ${time} ${name}\n`;
         writeData(log);
         return id
     } catch (err) { 
         console.error(err);
     }
 }
+
+function parseLogLine(line) {
+    const [id, time, name] = line.split(" ");
+    return { id, time, name };
+}
+function parseLines(string) {
+    const lines = string.split("\n");
+    const logs = []
+    for (const line of lines) {
+        if (line) {
+            const log = parseLogLine(line);
+            logs.push(log);
+        }
+    }
+    return logs;
+}
+
+
+async function getAllLogs() {
+    return readData().then((data) => {
+        const logs = parseLines(data);
+        return logs;
+    }).catch((err) => {
+        console.error(err);
+    });
+}
+
+async function logSearch(id){
+    const logs = getAllLogs();
+    logs.then((logs) => {
+        const log = logs.find(log => log.id === id);
+        console.log(log)
+    })
+}
+
 
 app.use(express.json());
 
@@ -53,3 +88,6 @@ app.post("/logs", express.json(), async (req, res) => {
 app.listen(port, () => {
     console.log(`Servidor rodando em http://localhost:${port}`);
 })
+
+const logs = logSearch("01673575-8f28-457f-9dc4-12f9d7160908");
+console.log(logs)
