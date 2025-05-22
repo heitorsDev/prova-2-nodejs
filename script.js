@@ -28,12 +28,28 @@ async function createLog(name){
     try {
         const log = `${id} ${time} ${name} \n`;
         writeData(log);
+        return id
     } catch (err) { 
         console.error(err);
     }
 }
 
 app.use(express.json());
+
+app.post("/logs", express.json(), async (req, res) => {
+    const name = req.body.name;
+    if (!name) {
+        return res.status(400).json({ error: "nome do usuário obrigatório" });
+    }
+    try {
+        const id = await createLog(name);
+        res.status(201).json({ message: "log criado com sucesso", id: id });
+    } catch (err) {
+        res.status(500).json({ error: "erro ao criar log" });
+    }
+
+})
+
 app.listen(port, () => {
     console.log(`Servidor rodando em http://localhost:${port}`);
 })
